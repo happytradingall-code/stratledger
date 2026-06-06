@@ -150,7 +150,135 @@ window.onload = () => {
 
   loadData();
 };
+function renderMonthlyStats() {
 
+  const monthly = {};
+
+  trades.forEach(t => {
+
+    const d = new Date(t[0]);
+
+    if (isNaN(d)) return;
+
+    const month =
+      d.toLocaleString('en-IN', {
+        month: 'short',
+        year: 'numeric'
+      });
+
+    if (!monthly[month]) {
+
+      monthly[month] = {
+        trades: 0,
+        pnl: 0,
+        roi: 0
+      };
+
+    }
+
+    monthly[month].trades++;
+
+    monthly[month].pnl += Number(t[6]) || 0;
+
+    monthly[month].roi +=
+      (Number(t[9]) || 0);
+
+  });
+
+  let html = `
+  <table style="
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;">
+    <tr>
+      <th align="left">Month</th>
+      <th>Trades</th>
+      <th>P&L</th>
+      <th>ROI%</th>
+    </tr>
+  `;
+
+  const labels = [];
+  const values = [];
+
+  Object.keys(monthly).forEach(m => {
+
+    labels.push(m);
+
+    values.push(
+      Math.round(monthly[m].pnl)
+    );
+
+    html += `
+      <tr>
+        <td>${m}</td>
+        <td align="center">
+          ${monthly[m].trades}
+        </td>
+        <td align="right">
+          ₹${monthly[m].pnl.toLocaleString()}
+        </td>
+        <td align="right">
+          ${monthly[m].roi.toFixed(2)}
+        </td>
+      </tr>
+    `;
+  });
+
+  html += '</table>';
+
+  document.getElementById(
+    'monthlyTable'
+  ).innerHTML = html;
+
+  const canvas =
+    document.getElementById(
+      'monthlyChart'
+    );
+
+  if (!canvas) return;
+
+  if (window.monthlyChartObj) {
+    window.monthlyChartObj.destroy();
+  }
+
+  window.monthlyChartObj =
+    new Chart(canvas, {
+
+      type: 'bar',
+
+      data: {
+
+        labels: labels,
+
+        datasets: [{
+
+          label: 'Monthly P&L',
+
+          data: values
+
+        }]
+
+      },
+
+      options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        plugins: {
+
+          legend: {
+            display: false
+          }
+
+        }
+
+      }
+
+    });
+}
 function renderEquityChart() {
 
   if (typeof Chart === 'undefined') return;
