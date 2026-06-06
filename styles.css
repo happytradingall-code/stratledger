@@ -131,6 +131,18 @@ button:disabled{
 #equityChart{
   width:100% !important;
   height:140px !important;
+  max-height:140px !important;
+}
+
+#monthlyChart{
+  width:100% !important;
+  height:180px !important;
+  max-height:180px !important;
+}
+
+.monthly-chart-card{
+  height:240px;
+  overflow:hidden;
 }
 
 .small{
@@ -147,6 +159,26 @@ button:disabled{
   line-height:1.8;
 }
 
+#monthlyTable{
+  overflow-x:auto;
+}
+
+#monthlyTable table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+#monthlyTable th{
+  text-align:left;
+  padding:8px 4px;
+  border-bottom:1px solid #ddd;
+}
+
+#monthlyTable td{
+  padding:8px 4px;
+  border-bottom:1px solid #f0f0f0;
+}
+
 @media (max-width:600px){
 
   .header h2{
@@ -160,6 +192,10 @@ button:disabled{
 
   .kpi h2{
     font-size:24px;
+  }
+
+  #monthlyTable{
+    font-size:13px;
   }
 
 }
