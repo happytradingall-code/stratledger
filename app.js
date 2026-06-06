@@ -68,7 +68,8 @@ async function loadData() {
 
   document.getElementById('ledger').innerHTML = html;
 
-  renderEquityChart();
+renderEquityChart();
+renderMonthlyStats();
 }
 
 function validateForm() {
