@@ -1,9 +1,3 @@
-
-These appear in 3 places and completely break JavaScript execution.
-
-Rather than patching it line-by-line, replace your entire `app.js` with this clean version:
-
-:::writing{variant="document" id="53184"}
 let trades = [];
 let equityChart = null;
 
