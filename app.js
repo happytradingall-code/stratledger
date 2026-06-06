@@ -186,21 +186,3 @@ function renderEquityChart() {
 
   });
 }
-:::
-
-Then:
-
-1. Delete everything in GitHub `app.js`
-2. Paste the above
-3. Commit changes
-4. Wait 30–60 seconds for Vercel
-5. Refresh the site
-
-This should restore:
-- KPIs
-- Ledger
-- Trade Entry
-- Equity Curve (without dates)
-- Stats
-
-and get you back to the last stable version.
