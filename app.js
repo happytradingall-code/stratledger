@@ -104,16 +104,21 @@ async function saveTrade() {
 
   const res = await r.json();
 
-  document.getElementById('msg').innerHTML =
-    '✅ Trade Saved<br>Trade ID: ' +
-    (res.tradeId || '');
+document.getElementById('msg').innerHTML =
+  '✅ Trade Saved<br>Trade ID: ' +
+  (res.tradeId || '');
 
-  pnlv.value = '';
-  remarks.value = '';
+direction.value = '';
 
-  await loadData();
+pnlv.value = '';
 
-  saveBtn.disabled = false;
+lots.value = '1';
+
+remarks.value = '';
+
+validateForm();
+
+await loadData();
 }
 
 window.onload = () => {
