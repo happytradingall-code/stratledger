@@ -1,57 +1,166 @@
+<!DOCTYPE html>
+<html>
 
-<!DOCTYPE html><html><head>
+<head>
+
 <meta name='viewport' content='width=device-width,initial-scale=1'>
+
 <link rel='stylesheet' href='styles.css'>
-<title>StratLedger V13.2 Live</title></head><body>
-<div class='header'><h2>StratLedger V13.2</h2><div>Crude Oil Vetri Nichayam</div></div>
+
+<title>StratLedger V13.4 Live</title>
+
+</head>
+
+<body>
+
+<div class='header'>
+  <h2>StratLedger V13.4</h2>
+  <div>Crude Oil Vetri Nichayam</div>
+</div>
+
 <div class='wrap'>
 
-<div id='home' class='page active'>
-<div class='card'><b>Current Strategy</b><br>Version V7<br>Capital ₹300000</div>
-<div class='grid'>
-<div class='kpi g'>Total P&L<h2 id='pnl'>-</h2></div>
-<div class='kpi p'>Win Rate<h2 id='winrate'>-</h2></div>
-<div class='kpi b'>ROI<h2 id='roi'>-</h2></div>
-<div class='kpi o'>Trades<h2 id='trades'>-</h2></div>
-</div>
-<div class='card'><b>Latest Trade</b><div id='latest'></div></div>
-<div class='card'><b>Equity Curve</b><canvas id='equityChart' height='140'></canvas></div>
-</div>
+  <div id='home' class='page active'>
 
-<div id='trade' class='page'>
-<div class='card'>
-<input type='date' id='date'>
-<select id='user'><option selected>Nav</option><option>Visnu</option><option>VJ</option></select>
-<select id='type'><option>Live</option><option>Paper</option></select>
-<select id='version'><option>V7</option><option>V6</option><option>V4.3.9</option><option>V4.3.8</option></select>
-<input id='capital' value='300000'>
-<select id='direction'><option>NA</option><option>Long</option><option>Short</option></select>
-<input id='pnlv' placeholder='PNL'>
-<input id='lots' value='1'>
-<textarea id='remarks' placeholder='Remarks'></textarea>
-<button id='saveBtn' onclick='saveTrade()'>Save Trade</button>
-<div id='msg'></div>
-</div>
-</div>
+    <div class='card'>
+      <b>Current Strategy</b><br>
+      Version V7<br>
+      Capital ₹300000
+    </div>
 
-<div id='ledger' class='page'></div>
+    <div class='grid'>
 
-<div id='statsPage' class='page'>
-<div class='card'><h3>Performance</h3><div id='stats'></div></div>
-<div class='card'>Paper vs Live (next build)</div>
-<div class='card'>Version Analysis (next build)</div>
-<div class='card'>Monthly ROI (next build)</div>
-</div>
+      <div class='kpi g'>
+        Total P&L
+        <h2 id='pnl'>-</h2>
+      </div>
+
+      <div class='kpi p'>
+        Win Rate
+        <h2 id='winrate'>-</h2>
+      </div>
+
+      <div class='kpi b'>
+        ROI
+        <h2 id='roi'>-</h2>
+      </div>
+
+      <div class='kpi o'>
+        Trades
+        <h2 id='trades'>-</h2>
+      </div>
+
+    </div>
+
+    <div class='card'>
+      <b>Latest Trade</b>
+      <div id='latest'></div>
+    </div>
+
+    <div class='card'>
+      <b>Equity Curve</b>
+      <canvas id='equityChart' height='140'></canvas>
+    </div>
+
+  </div>
+
+  <div id='trade' class='page'>
+
+    <div class='card'>
+
+      <input type='date' id='date'>
+
+      <select id='user'>
+        <option value=''>Select User</option>
+        <option>Nav</option>
+        <option>Visnu</option>
+        <option>VJ</option>
+      </select>
+
+      <select id='type'>
+        <option selected>Live</option>
+        <option>Paper</option>
+      </select>
+
+      <select id='version'>
+        <option selected>V7</option>
+        <option>V6</option>
+        <option>V4.3.9</option>
+        <option>V4.3.8</option>
+      </select>
+
+      <input id='capital' value='300000'>
+
+      <select id='direction'>
+        <option value=''>Select Direction</option>
+        <option>Long</option>
+        <option>Short</option>
+      </select>
+
+      <input id='pnlv' placeholder='PNL (Required)'>
+
+      <input id='lots' value='1'>
+
+      <textarea id='remarks' placeholder='Remarks (Optional)'></textarea>
+
+      <button id='saveBtn' onclick='saveTrade()'>
+        Save Trade
+      </button>
+
+      <div id='msg'></div>
+
+    </div>
+
+  </div>
+
+  <div id='ledger' class='page'></div>
+
+  <div id='statsPage' class='page'>
+
+    <div class='card'>
+      <h3>Performance</h3>
+      <div id='stats'></div>
+    </div>
+
+    <div class='card'>
+      Paper vs Live (next build)
+    </div>
+
+    <div class='card'>
+      Version Analysis (next build)
+    </div>
+
+    <div class='card'>
+      Monthly ROI (next build)
+    </div>
+
+  </div>
 
 </div>
 
 <div class='nav'>
-<div onclick="showPage('home')">🏠 Home</div>
-<div onclick="showPage('trade')">➕ Trade</div>
-<div onclick="showPage('ledger')">📒 Ledger</div>
-<div onclick="showPage('statsPage')">📊 Stats</div>
+
+  <div onclick="showPage('home')">
+    🏠 Home
+  </div>
+
+  <div onclick="showPage('trade')">
+    ➕ Trade
+  </div>
+
+  <div onclick="showPage('ledger')">
+    📒 Ledger
+  </div>
+
+  <div onclick="showPage('statsPage')">
+    📊 Stats
+  </div>
+
 </div>
+
 <script src='https://cdn.jsdelivr.net/npm/chart.js'></script>
 <script src='config.js'></script>
 <script src='app.js'></script>
-</body></html>
+
+</body>
+</html>
