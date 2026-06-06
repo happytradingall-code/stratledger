@@ -31,7 +31,8 @@ async function loadData() {
     ((wins / Math.max(1, wins + losses)) * 100).toFixed(1) + '%';
 
   document.getElementById('latest').innerHTML =
-    `Trade ID: ${latest[12] || ''}
+    `Date: ${String(latest[0] || '').substring(0,10)}
+     <br>Trade ID: ${latest[12] || ''}
      <br>PNL: ₹${latest[6] || 0}
      <br>${latest[11] || ''}`;
 
@@ -74,11 +75,8 @@ function validateForm() {
 
   const ok =
     user.value &&
-    type.value &&
-    version.value &&
     direction.value &&
-    pnlv.value &&
-    remarks.value;
+    pnlv.value;
 
   saveBtn.disabled = !ok;
 }
@@ -120,10 +118,32 @@ async function saveTrade() {
 
 window.onload = () => {
 
-  alert("APP STARTED");
+  date.value =
+    new Date().toISOString().split('T')[0];
+
+  type.value = 'Live';
+
+  version.value = 'V7';
+
+  capital.value = '300000';
+
+  lots.value = '1';
+
+  [
+    'user',
+    'direction',
+    'pnlv'
+  ].forEach(id => {
+
+    document
+      .getElementById(id)
+      .addEventListener('input', validateForm);
+
+  });
+
+  validateForm();
 
   loadData();
-
 };
 
 function renderEquityChart() {
