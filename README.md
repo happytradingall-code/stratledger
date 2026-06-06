@@ -1,1 +1,1 @@
-# stratledger
+Upload all files to GitHub and deploy with Vercel.
