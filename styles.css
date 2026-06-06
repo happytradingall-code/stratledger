@@ -1,17 +1,165 @@
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#eef3ff;
+}
 
-body{margin:0;font-family:Arial,sans-serif;background:#eef3ff}
-.header{background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;padding:20px;border-bottom-left-radius:24px;border-bottom-right-radius:24px}
-.wrap{padding:12px;padding-bottom:90px}
-.page{display:none}.active{display:block}
-.card{background:#fff;border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.kpi{padding:14px;color:#fff;border-radius:16px}
-.g{background:#16a34a}.p{background:#7c3aed}.b{background:#2563eb}.o{background:#ea580c}
-input,select,textarea,button{width:100%;padding:12px;margin:6px 0;box-sizing:border-box;border-radius:10px;border:1px solid #ccc}
-button{background:#2563eb;color:#fff;border:none}
-button:disabled{background:#999}
-.nav{position:fixed;left:0;right:0;bottom:0;background:#fff;display:flex;justify-content:space-around;padding:10px 0;box-shadow:0 -4px 12px rgba(0,0,0,.1)}
-.ledger-profit{border-left:6px solid #22c55e}
-.ledger-loss{border-left:6px solid #ef4444}
-.chart{height:120px;border-radius:14px;background:linear-gradient(#f8fafc,#dbeafe);display:flex;align-items:center;justify-content:center}
-.small{font-size:12px;color:#666}
+.header{
+  background:linear-gradient(135deg,#2563eb,#7c3aed);
+  color:#fff;
+  padding:20px;
+  border-bottom-left-radius:24px;
+  border-bottom-right-radius:24px;
+}
+
+.wrap{
+  padding:12px;
+  padding-bottom:90px;
+}
+
+.page{
+  display:none;
+}
+
+.active{
+  display:block;
+}
+
+.card{
+  background:#fff;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:12px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.kpi{
+  padding:14px;
+  color:#fff;
+  border-radius:16px;
+  text-align:center;
+}
+
+.kpi h2{
+  margin:8px 0 0;
+  font-size:28px;
+}
+
+.g{
+  background:#16a34a;
+}
+
+.p{
+  background:#7c3aed;
+}
+
+.b{
+  background:#2563eb;
+}
+
+.o{
+  background:#ea580c;
+}
+
+input,
+select,
+textarea,
+button{
+  width:100%;
+  padding:16px;
+  margin:8px 0;
+  box-sizing:border-box;
+  border-radius:12px;
+  border:1px solid #ccc;
+  font-size:18px;
+}
+
+textarea{
+  min-height:90px;
+  resize:vertical;
+}
+
+button{
+  background:#2563eb;
+  color:#fff;
+  border:none;
+  font-size:20px;
+  font-weight:600;
+}
+
+button:disabled{
+  background:#999;
+}
+
+.nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:#fff;
+  display:flex;
+  justify-content:space-around;
+  padding:10px 0;
+  box-shadow:0 -4px 12px rgba(0,0,0,.1);
+}
+
+.nav div{
+  font-size:16px;
+  font-weight:600;
+}
+
+.ledger-profit{
+  border-left:6px solid #22c55e;
+}
+
+.ledger-loss{
+  border-left:6px solid #ef4444;
+}
+
+.chart{
+  height:140px;
+  border-radius:14px;
+  overflow:hidden;
+}
+
+#equityChart{
+  width:100% !important;
+  height:140px !important;
+}
+
+.small{
+  font-size:13px;
+  color:#666;
+}
+
+#latest{
+  margin-top:8px;
+  line-height:1.6;
+}
+
+#stats{
+  line-height:1.8;
+}
+
+@media (max-width:600px){
+
+  .header h2{
+    margin:0;
+    font-size:24px;
+  }
+
+  .grid{
+    gap:8px;
+  }
+
+  .kpi h2{
+    font-size:24px;
+  }
+
+}
