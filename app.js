@@ -126,25 +126,10 @@ async function saveTrade() {
 
 window.onload = () => {
 
-  date.value =
-    new Date().toISOString().split('T')[0];
-
-  [
-    'user',
-    'type',
-    'version',
-    'direction',
-    'pnlv',
-    'remarks'
-  ].forEach(id => {
-
-    document
-      .getElementById(id)
-      .addEventListener('input', validateForm);
-
-  });
+  alert("APP STARTED");
 
   loadData();
+
 };
 
 function renderEquityChart() {
