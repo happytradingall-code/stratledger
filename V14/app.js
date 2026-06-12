@@ -11,6 +11,15 @@ function todayLocal() {
   return `${y}-${m}-${day}`;
 }
 
+// ─── Fix: display date as plain text (never pass through new Date) ───
+// This prevents IST timezone shifting the date back by 1 day
+function fixDate(raw) {
+  const s = String(raw || '').substring(0, 10);
+  if (!s || s.length < 10) return s;
+  const [y, m, d] = s.split('-');
+  return `${d}/${m}/${y}`;
+}
+
 function showPage(id, navId) {
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -100,7 +109,7 @@ function renderHome() {
     document.getElementById('latest').innerHTML = `
       <div class="latest-pnl ${isPos ? 'pos' : 'neg'}">${fmt(pnlNum)}</div>
       <div class="lc-tags">
-        <span class="lc-tag">${String(latest[0] || '').substring(0,10)}</span>
+        <span class="lc-tag">${fixDate(latest[0])}</span>
         <span class="lc-tag dir-${(latest[5]||'').toLowerCase()}">${latest[5] || ''}</span>
         <span class="lc-tag">${latest[1] || ''}</span>
         <span class="lc-tag">${latest[2] || 'Live'}</span>
@@ -139,7 +148,7 @@ function renderLedger(filtered) {
         <button class="lc-edit-btn" onclick="openEdit('${t[12]}')">Edit</button>
         <div class="lc-top">
           <span class="lc-pnl ${isPos ? 'pos' : 'neg'}">${fmt(pnlNum)}</span>
-          <span class="lc-date">${String(t[0]||'').substring(0,10)}</span>
+          <span class="lc-date">${fixDate(t[0])}</span>
         </div>
         <div class="lc-tags">
           <span class="lc-tag dir-${dir}">${t[5] || ''}</span>
@@ -209,7 +218,10 @@ function computeMaxDD() {
 function renderMonthlyStats() {
   const monthly = {};
   trades.forEach(t => {
-    const d = new Date(t[0]);
+    const s = String(t[0] || '').substring(0, 10);
+    if (!s || s.length < 10) return;
+    const [y, mo, dy] = s.split('-');
+    const d = new Date(Number(y), Number(mo) - 1, Number(dy)); // local date, no UTC shift
     if (isNaN(d)) return;
     const month = d.toLocaleString('en-IN', { month: 'short', year: 'numeric' });
     if (!monthly[month]) monthly[month] = { trades: 0, pnl: 0, wins: 0 };
@@ -393,7 +405,7 @@ function openEdit(tradeId) {
   const t = trades.find(x => x[12] == tradeId);
   if (!t) return;
 
-  document.getElementById('editDate').value = String(t[0] || '').substring(0, 10);
+  document.getElementById('editDate').value = String(t[0] || '').substring(0, 10); // keep YYYY-MM-DD for date input
   document.getElementById('editUser').value = t[1] || '';
   document.getElementById('editType').value = t[2] || 'Live';
   document.getElementById('editDirection').value = t[5] || '';
