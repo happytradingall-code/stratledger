@@ -11,13 +11,25 @@ function todayLocal() {
   return `${y}-${m}-${day}`;
 }
 
-// ─── Fix: display date as plain text (never pass through new Date) ───
-// This prevents IST timezone shifting the date back by 1 day
+// ─── Fix: display date without any timezone conversion ───
+// Google Sheets can return "2026-06-12", "2026-06-12T00:00:00.000Z", or "06/12/2026"
+// We ONLY read the digit characters — never pass through new Date()
 function fixDate(raw) {
-  const s = String(raw || '').substring(0, 10);
-  if (!s || s.length < 10) return s;
-  const [y, m, d] = s.split('-');
-  return `${d}/${m}/${y}`;
+  const s = String(raw || '').trim();
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
+  const us = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (us) return us[2] + '/' + us[1] + '/' + us[3];
+  return s.substring(0, 10);
+}
+
+function parseDateParts(raw) {
+  const s = String(raw || '').trim();
+  const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return { y: iso[1], m: iso[2], d: iso[3] };
+  const us = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (us) return { y: us[3], m: us[1], d: us[2] };
+  return null;
 }
 
 function showPage(id, navId) {
@@ -145,7 +157,6 @@ function renderLedger(filtered) {
     const dir = (t[5] || '').toLowerCase();
     html += `
       <div class="ledger-card ${isPos ? 'profit' : 'loss'}">
-        <button class="lc-edit-btn" onclick="openEdit('${t[12]}')">Edit</button>
         <div class="lc-top">
           <span class="lc-pnl ${isPos ? 'pos' : 'neg'}">${fmt(pnlNum)}</span>
           <span class="lc-date">${fixDate(t[0])}</span>
@@ -159,6 +170,9 @@ function renderLedger(filtered) {
           ${t[12] ? `<span class="lc-tag" style="font-size:10px">#${t[12]}</span>` : ''}
         </div>
         ${t[11] ? `<div class="lc-remarks">${t[11]}</div>` : ''}
+        <div class="lc-footer">
+          <button class="lc-edit-btn" onclick="openEdit('${t[12]}')">✏ Edit</button>
+        </div>
       </div>
     `;
   });
@@ -218,12 +232,10 @@ function computeMaxDD() {
 function renderMonthlyStats() {
   const monthly = {};
   trades.forEach(t => {
-    const s = String(t[0] || '').substring(0, 10);
-    if (!s || s.length < 10) return;
-    const [y, mo, dy] = s.split('-');
-    const d = new Date(Number(y), Number(mo) - 1, Number(dy)); // local date, no UTC shift
-    if (isNaN(d)) return;
-    const month = d.toLocaleString('en-IN', { month: 'short', year: 'numeric' });
+    const parts = parseDateParts(t[0]);
+    if (!parts) return;
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const month = monthNames[parseInt(parts.m,10)-1] + ' ' + parts.y;
     if (!monthly[month]) monthly[month] = { trades: 0, pnl: 0, wins: 0 };
     monthly[month].trades++;
     monthly[month].pnl += Number(t[6]) || 0;
