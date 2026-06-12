@@ -257,28 +257,36 @@ function renderMonthlyStats() {
     if (!parts) return;
     const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const month = monthNames[parseInt(parts.m,10)-1] + ' ' + parts.y;
-    if (!monthly[month]) monthly[month] = { trades: 0, pnl: 0, wins: 0 };
+    if (!monthly[month]) monthly[month] = { trades: 0, pnl: 0, wins: 0, capital: 0 };
     monthly[month].trades++;
     monthly[month].pnl += Number(t[6]) || 0;
     if (Number(t[6]) > 0) monthly[month].wins++;
+    // Use the highest capital seen in the month as the base
+    const cap = Number(t[4]) || 0;
+    if (cap > monthly[month].capital) monthly[month].capital = cap;
   });
 
   const keys = Object.keys(monthly);
   let html = `
     <div class="monthly-row header">
-      <div>Month</div><div>Trades</div><div>P&L</div><div>Win%</div>
+      <div>Month</div><div>Trades</div><div>P&L</div><div>Win%</div><div>ROI%</div>
     </div>
   `;
   keys.forEach(m => {
     const r = monthly[m];
     const wr = ((r.wins / Math.max(1, r.trades)) * 100).toFixed(0);
     const pos = r.pnl >= 0;
+    const roi = r.capital > 0 ? ((r.pnl / r.capital) * 100).toFixed(1) : null;
+    const roiHtml = roi !== null
+      ? `<div style="color:${pos ? 'var(--green)' : 'var(--red)'};font-weight:600">${pos ? '+' : ''}${roi}%</div>`
+      : `<div style="color:var(--text-muted)">—</div>`;
     html += `
       <div class="monthly-row">
         <div>${m}</div>
         <div style="color:var(--text-muted)">${r.trades}</div>
         <div class="monthly-pnl ${pos ? 'pos' : 'neg'}">${pos ? '+' : ''}₹${Math.round(r.pnl).toLocaleString('en-IN')}</div>
         <div style="color:var(--text-muted)">${wr}%</div>
+        ${roiHtml}
       </div>
     `;
   });

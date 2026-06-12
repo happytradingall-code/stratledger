@@ -370,7 +370,7 @@ button:active { transform: scale(0.98); }
 
 .monthly-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.5fr 1fr;
+  grid-template-columns: 2fr 1fr 1.5fr 1fr 1fr;
   gap: 6px;
   padding: 9px 6px;
   border-bottom: 1px solid var(--border);
