@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>StratLedger V14</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-mark">SL</div>
+    <div class="logo-text">
+      <span class="logo-name">StratLedger</span>
+      <span class="logo-version">V14</span>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="tag-live">● LIVE</div>
+    <div class="strategy-badge" id="stratBadge">V7 · ₹3L</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- HOME PAGE -->
+  <div id="home" class="page active">
+
+    <div class="kpi-strip">
+      <div class="kpi-card kpi-green">
+        <div class="kpi-label">Total P&L</div>
+        <div class="kpi-value mono" id="pnl">—</div>
+      </div>
+      <div class="kpi-card kpi-purple">
+        <div class="kpi-label">Win Rate</div>
+        <div class="kpi-value mono" id="winrate">—</div>
+      </div>
+      <div class="kpi-card kpi-blue">
+        <div class="kpi-label">ROI</div>
+        <div class="kpi-value mono" id="roi">—</div>
+      </div>
+      <div class="kpi-card kpi-orange">
+        <div class="kpi-label">Trades</div>
+        <div class="kpi-value mono" id="trades">—</div>
+      </div>
+    </div>
+
+    <div class="metrics-row">
+      <div class="metric-pill">
+        <div class="mp-label">Avg Win</div>
+        <div class="mp-value green" id="avgWin">—</div>
+      </div>
+      <div class="metric-pill">
+        <div class="mp-label">Avg Loss</div>
+        <div class="mp-value red" id="avgLoss">—</div>
+      </div>
+      <div class="metric-pill">
+        <div class="mp-label">Best Day</div>
+        <div class="mp-value green" id="bestDay">—</div>
+      </div>
+      <div class="metric-pill">
+        <div class="mp-label">Worst Day</div>
+        <div class="mp-value red" id="worstDay">—</div>
+      </div>
+      <div class="metric-pill">
+        <div class="mp-label">Streak</div>
+        <div class="mp-value" id="streak">—</div>
+      </div>
+      <div class="metric-pill">
+        <div class="mp-label">RR Ratio</div>
+        <div class="mp-value" id="rrRatio">—</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-title">Equity Curve</span>
+        <span class="section-sub" id="equityChange"></span>
+      </div>
+      <canvas id="equityChart" height="130"></canvas>
+    </div>
+
+    <div class="section-card latest-trade-card">
+      <div class="section-header">
+        <span class="section-title">Latest Trade</span>
+      </div>
+      <div id="latest" class="latest-body"></div>
+    </div>
+
+  </div>
+
+  <!-- TRADE ENTRY PAGE -->
+  <div id="trade" class="page">
+
+    <div class="section-card">
+      <div class="section-title" style="margin-bottom:16px">Log Trade</div>
+
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input type="date" id="date" class="field-input">
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">User</label>
+          <select id="user" class="field-input">
+            <option value="">Select</option>
+            <option>Nav</option>
+            <option>Visnu</option>
+            <option>VJ</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Type</label>
+          <select id="type" class="field-input">
+            <option>Live</option>
+            <option>Paper</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Strategy</label>
+          <input id="version" type="text" value="V7" placeholder="Version" class="field-input">
+        </div>
+        <div class="field-group">
+          <label class="field-label">Capital (₹)</label>
+          <input id="capital" value="300000" class="field-input">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Direction</label>
+          <select id="direction" class="field-input">
+            <option value="">Select</option>
+            <option>Long</option>
+            <option>Short</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Lots</label>
+          <input id="lots" value="1" class="field-input">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">P&L (₹) <span class="required-star">*</span></label>
+        <input id="pnlv" placeholder="Enter P&L amount" class="field-input pnl-input">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Remarks</label>
+        <textarea id="remarks" placeholder="Optional notes…" class="field-input"></textarea>
+      </div>
+
+      <button id="saveBtn" onclick="saveTrade()" disabled>
+        <span id="saveBtnText">Save Trade</span>
+      </button>
+
+      <div id="msg" class="save-msg"></div>
+    </div>
+
+  </div>
+
+  <!-- LEDGER PAGE -->
+  <div id="ledger" class="page">
+    <div class="ledger-header">
+      <span class="section-title">Trade Ledger</span>
+      <div class="ledger-filters">
+        <input id="ledgerSearch" class="search-input" placeholder="Search…" oninput="filterLedger()">
+        <select id="ledgerFilter" class="filter-select" onchange="filterLedger()">
+          <option value="">All</option>
+          <option value="profit">Wins</option>
+          <option value="loss">Losses</option>
+        </select>
+      </div>
+    </div>
+    <div id="ledgerList"></div>
+  </div>
+
+  <!-- STATS PAGE -->
+  <div id="statsPage" class="page">
+
+    <div class="section-card">
+      <div class="section-title" style="margin-bottom:14px">Performance Overview</div>
+      <div id="stats" class="stats-grid"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title" style="margin-bottom:14px">Monthly Breakdown</div>
+      <div id="monthlyTable"></div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-header">
+        <span class="section-title">Monthly P&L Trend</span>
+      </div>
+      <canvas id="monthlyChart" height="180"></canvas>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title" style="margin-bottom:14px">Trade Distribution</div>
+      <canvas id="distChart" height="160"></canvas>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="nav">
+  <div class="nav-item active" id="nav-home" onclick="showPage('home','nav-home')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>Home</span>
+  </div>
+  <div class="nav-item" id="nav-trade" onclick="showPage('trade','nav-trade')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    <span>Trade</span>
+  </div>
+  <div class="nav-item" id="nav-ledger" onclick="showPage('ledger','nav-ledger')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+    <span>Ledger</span>
+  </div>
+  <div class="nav-item" id="nav-statsPage" onclick="showPage('statsPage','nav-statsPage')">
+    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    <span>Stats</span>
+  </div>
+</nav>
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
