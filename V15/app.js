@@ -66,7 +66,7 @@ function showPage(id, navId) {
 // ─── Format helpers ───
 function fmt(n) {
   const v = Number(n);
-  return (v >= 0 ? '+' : '') + '₹' + Math.abs(v).toLocaleString('en-IN');
+  return (v >= 0 ? '+' : '-') + '₹' + Math.abs(v).toLocaleString('en-IN');
 }
 
 function fmtAbs(n) {
