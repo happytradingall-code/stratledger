@@ -92,8 +92,6 @@ async function loadData() {
     const rows = await r.json();
     allTrades = rows.slice(1);
     trades = [...allTrades];
-    
-    }
     buildVersionFilter();
     renderHome();
     renderLedger();
@@ -504,8 +502,3 @@ window.onload = () => {
 
   ['user', 'direction', 'pnlv'].forEach(id => {
     document.getElementById(id).addEventListener('input', validateForm);
-  });
-
-  validateForm();
-  loadData();
-};
