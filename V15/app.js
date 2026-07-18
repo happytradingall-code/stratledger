@@ -475,6 +475,49 @@ async function deleteTradeConfirm() {
 }
 
 // ─── Init ───
+// ─── Download Excel ───
+function downloadExcel() {
+  if (!trades.length) return;
+
+  const tradeHeaders = ['Date','User','Type','Version','Capital','Direction','P&L','Lots','Equity','','','Remarks','Trade#'];
+  const tradeRows = trades.map(t => [
+    fixDate(t[0]), t[1]||'', t[2]||'', (t[3]||'').trim(), Number(t[4])||'',
+    t[5]||'', Number(t[6])||0, Number(t[7])||1,
+    Number(t[8])||'', '', '', t[11]||'', t[12]||''
+  ]);
+
+  const monthly = {};
+  trades.forEach(t => {
+    const parts = parseDateParts(t[0]);
+    if (!parts) return;
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const month = monthNames[parseInt(parts.m,10)-1] + ' ' + parts.y;
+    if (!monthly[month]) monthly[month] = { trades: 0, pnl: 0, wins: 0, capital: 0 };
+    monthly[month].trades++;
+    monthly[month].pnl += Number(t[6]) || 0;
+    if (Number(t[6]) > 0) monthly[month].wins++;
+    const cap = Number(t[4]) || 0;
+    if (cap > monthly[month].capital) monthly[month].capital = cap;
+  });
+  const monthHeaders = ['Month','Trades','P&L (₹)','Win %','ROI %'];
+  const monthRows = Object.entries(monthly).map(([m, r]) => {
+    const wr = ((r.wins / Math.max(1, r.trades)) * 100).toFixed(1);
+    const roi = r.capital > 0 ? ((r.pnl / r.capital) * 100).toFixed(2) : '';
+    return [m, r.trades, Math.round(r.pnl), parseFloat(wr), roi !== '' ? parseFloat(roi) : ''];
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws1 = XLSX.utils.aoa_to_sheet([tradeHeaders, ...tradeRows]);
+  ws1['!cols'] = [10,8,6,8,10,10,10,6,10,0,0,20,8].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws1, 'Trades');
+  const ws2 = XLSX.utils.aoa_to_sheet([monthHeaders, ...monthRows]);
+  ws2['!cols'] = [12,8,12,8,8].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws2, 'Monthly');
+
+  const today = todayLocal();
+  XLSX.writeFile(wb, `StratLedger_${today}.xlsx`);
+}
+
 window.onload = () => {
   // Fix: use local date (no UTC off-by-one)
   document.getElementById('date').value = todayLocal();
