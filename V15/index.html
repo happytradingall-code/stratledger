@@ -187,7 +187,7 @@
   <div id="statsPage" class="page">
 
     <div class="section-card">
-      <div class="section-title" style="margin-bottom:14px">Performance Overview</div>
+      <div class="section-header">   <span class="section-title">Performance Overview</span>   <button onclick="downloadExcel()" style="padding:6px 14px;border-radius:8px;border:1.5px solid #22d47a;background:transparent;color:#22d47a;font-size:12px;font-weight:600;cursor:pointer;">⬇ Excel</button> </div>
       <div id="stats" class="stats-grid"></div>
     </div>
 
@@ -292,6 +292,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>
