@@ -1,31 +1,24 @@
-let trades = [];
+let allTrades = [];   // raw data from sheet — never filtered
+let trades = [];      // active dataset (filtered by version)
+let activeVersion = 'All';
 let equityChart = null;
 let allLedgerTrades = [];
 
-// ─── Fix: use local date string to avoid UTC off-by-one ───
+// ─── Date helpers (IST-safe) ───
 function todayLocal() {
   const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${day}`;
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// ─── Fix: display date in IST — add 1 day for ISO timestamps from Google Sheets ───
-// Google Sheets stores dates as midnight UTC (e.g. "2026-06-11T18:30:00.000Z" for IST June 12).
-// When Sheets returns a timestamp with "T", we parse it as UTC and convert to IST (+5:30).
-// Plain date strings like "2026-06-12" or "06/12/2026" are used as-is (already IST).
 function fixDate(raw) {
   const s = String(raw || '').trim();
-  // ISO timestamp with time component — interpret as UTC, convert to IST
   if (s.includes('T')) {
     const d = new Date(s);
     if (!isNaN(d)) {
       const ist = new Date(d.getTime() + 5.5 * 60 * 60 * 1000);
-      const dd = String(ist.getUTCDate()).padStart(2, '0');
-      const mm = String(ist.getUTCMonth() + 1).padStart(2, '0');
-      const yyyy = ist.getUTCFullYear();
-      return dd + '/' + mm + '/' + yyyy;
+      return String(ist.getUTCDate()).padStart(2,'0') + '/' +
+             String(ist.getUTCMonth()+1).padStart(2,'0') + '/' +
+             ist.getUTCFullYear();
     }
   }
   const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -37,16 +30,11 @@ function fixDate(raw) {
 
 function parseDateParts(raw) {
   const s = String(raw || '').trim();
-  // ISO timestamp with time component — interpret as UTC, convert to IST
   if (s.includes('T')) {
     const d = new Date(s);
     if (!isNaN(d)) {
       const ist = new Date(d.getTime() + 5.5 * 60 * 60 * 1000);
-      return {
-        y: String(ist.getUTCFullYear()),
-        m: String(ist.getUTCMonth() + 1).padStart(2, '0'),
-        d: String(ist.getUTCDate()).padStart(2, '0')
-      };
+      return { y: String(ist.getUTCFullYear()), m: String(ist.getUTCMonth()+1).padStart(2,'0'), d: String(ist.getUTCDate()).padStart(2,'0') };
     }
   }
   const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
@@ -68,9 +56,28 @@ function fmt(n) {
   const v = Number(n);
   return (v >= 0 ? '+' : '-') + '₹' + Math.abs(v).toLocaleString('en-IN');
 }
-
 function fmtAbs(n) {
   return '₹' + Math.abs(Number(n)).toLocaleString('en-IN');
+}
+
+// ─── Version filter ───
+function buildVersionFilter() {
+  const versions = [...new Set(allTrades.map(t => (t[3] || '').trim()).filter(Boolean))].sort();
+  const bar = document.getElementById('versionFilterBar');
+  let html = `<button class="ver-btn ${activeVersion === 'All' ? 'active' : ''}" onclick="setVersion('All')">All</button>`;
+  versions.forEach(v => {
+    html += `<button class="ver-btn ${activeVersion === v ? 'active' : ''}" onclick="setVersion('${v}')">${v}</button>`;
+  });
+  bar.innerHTML = html;
+}
+
+function setVersion(v) {
+  activeVersion = v;
+  trades = v === 'All' ? [...allTrades] : allTrades.filter(t => (t[3] || '').trim() === v);
+  buildVersionFilter();
+  renderHome();
+  renderLedger();
+  renderStats();
 }
 
 // ─── Load data ───
@@ -78,7 +85,9 @@ async function loadData() {
   try {
     const r = await fetch(API_URL);
     const rows = await r.json();
-    trades = rows.slice(1);
+    allTrades = rows.slice(1);
+    trades = [...allTrades];
+    buildVersionFilter();
     renderHome();
     renderLedger();
     renderStats();
@@ -88,7 +97,6 @@ async function loadData() {
 }
 
 function renderHome() {
-  const liveTrades = trades.filter(t => t[2] === 'Live' || !t[2]);
   const wins = trades.filter(t => Number(t[6]) > 0);
   const losses = trades.filter(t => Number(t[6]) < 0);
   const latest = trades[trades.length - 1] || [];
@@ -99,12 +107,10 @@ function renderHome() {
 
   document.getElementById('pnl').textContent = '₹' + totalPnl.toLocaleString('en-IN');
   document.getElementById('pnl').style.color = totalPnl >= 0 ? 'var(--green)' : 'var(--red)';
-
   document.getElementById('winrate').textContent = winRate + '%';
   document.getElementById('roi').textContent = roi + '%';
   document.getElementById('trades').textContent = trades.length;
 
-  // Extra metrics
   const avgWin = wins.length ? wins.reduce((s, t) => s + Number(t[6]), 0) / wins.length : 0;
   const avgLoss = losses.length ? losses.reduce((s, t) => s + Number(t[6]), 0) / losses.length : 0;
   const pnls = trades.map(t => Number(t[6]) || 0);
@@ -116,7 +122,6 @@ function renderHome() {
   document.getElementById('bestDay').textContent = bestDay ? '₹' + bestDay.toLocaleString('en-IN') : '—';
   document.getElementById('worstDay').textContent = worstDay ? '₹' + Math.abs(worstDay).toLocaleString('en-IN') : '—';
 
-  // Current streak
   let streak = 0, streakDir = '';
   for (let i = trades.length - 1; i >= 0; i--) {
     const p = Number(trades[i][6]);
@@ -128,17 +133,14 @@ function renderHome() {
   streakEl.textContent = trades.length ? streak + streakDir : '—';
   streakEl.style.color = streakDir === 'W' ? 'var(--green)' : 'var(--red)';
 
-  // RR Ratio
   const rr = avgLoss !== 0 ? (Math.abs(avgWin) / Math.abs(avgLoss)).toFixed(2) : '—';
   document.getElementById('rrRatio').textContent = rr !== '—' ? rr + ':1' : '—';
 
-  // Strategy badge
   if (latest[3]) {
     const cap = Number(latest[4]) || 300000;
     document.getElementById('stratBadge').textContent = latest[3] + ' · ₹' + (cap / 100000).toFixed(0) + 'L';
   }
 
-  // Latest trade
   if (latest.length) {
     const pnlNum = Number(latest[6]) || 0;
     const isPos = pnlNum >= 0;
@@ -157,7 +159,6 @@ function renderHome() {
     document.getElementById('latest').textContent = 'No trades yet.';
   }
 
-  // Equity change label
   if (trades.length >= 2) {
     const last = Number(trades[trades.length-1][8]) || 0;
     const prev = Number(trades[trades.length-2][8]) || 0;
@@ -204,7 +205,7 @@ function renderLedger(filtered) {
 function filterLedger() {
   const q = document.getElementById('ledgerSearch').value.toLowerCase();
   const f = document.getElementById('ledgerFilter').value;
-  let list = allLedgerTrades.length ? allLedgerTrades : [...trades].reverse();
+  let list = [...trades].reverse();
 
   if (f === 'profit') list = list.filter(t => Number(t[6]) > 0);
   if (f === 'loss') list = list.filter(t => Number(t[6]) < 0);
@@ -228,7 +229,7 @@ function renderStats() {
     <div class="stat-item"><div class="stat-label">Win Rate</div><div class="stat-value" style="color:var(--green)">${winRate}%</div></div>
     <div class="stat-item"><div class="stat-label">Wins</div><div class="stat-value" style="color:var(--green)">${wins.length}</div></div>
     <div class="stat-item"><div class="stat-label">Losses</div><div class="stat-value" style="color:var(--red)">${losses.length}</div></div>
-    <div class="stat-item"><div class="stat-label">Total P&L</div><div class="stat-value" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}">${fmt(totalPnl)}</div></div>
+    <div class="stat-item"><div class="stat-label">Total P&L</div><div class="stat-value" style="color:${totalPnl>=0?'var(--green)':'var(--red)'}}">${fmt(totalPnl)}</div></div>
     <div class="stat-item"><div class="stat-label">Avg Win</div><div class="stat-value" style="color:var(--green)">₹${Math.round(avgWin).toLocaleString('en-IN')}</div></div>
     <div class="stat-item"><div class="stat-label">Avg Loss</div><div class="stat-value" style="color:var(--red)">₹${Math.round(avgLoss).toLocaleString('en-IN')}</div></div>
     <div class="stat-item"><div class="stat-label">Max Drawdown</div><div class="stat-value" style="color:var(--red)">${maxDD}</div></div>
@@ -261,7 +262,6 @@ function renderMonthlyStats() {
     monthly[month].trades++;
     monthly[month].pnl += Number(t[6]) || 0;
     if (Number(t[6]) > 0) monthly[month].wins++;
-    // Use the highest capital seen in the month as the base
     const cap = Number(t[4]) || 0;
     if (cap > monthly[month].capital) monthly[month].capital = cap;
   });
@@ -292,7 +292,6 @@ function renderMonthlyStats() {
   });
   document.getElementById('monthlyTable').innerHTML = html;
 
-  // Monthly bar chart
   const canvas = document.getElementById('monthlyChart');
   if (!canvas) return;
   if (window.monthlyChartObj) window.monthlyChartObj.destroy();
@@ -341,9 +340,7 @@ function renderDistChart() {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: {
-        legend: {
-          labels: { color: '#7a8099', font: { size: 11 }, boxWidth: 12, padding: 16 }
-        }
+        legend: { labels: { color: '#7a8099', font: { size: 11 }, boxWidth: 12, padding: 16 } }
       },
       cutout: '65%'
     }
@@ -441,9 +438,57 @@ async function saveTrade() {
   }
 }
 
+// ─── Download Excel ───
+function downloadExcel() {
+  if (!trades.length) return;
+
+  // Sheet 1: All trades
+  const tradeHeaders = ['Date','User','Type','Version','Capital','Direction','P&L','Lots','Equity','','','Remarks','Trade#'];
+  const tradeRows = trades.map(t => [
+    fixDate(t[0]), t[1]||'', t[2]||'', t[3]||'', Number(t[4])||'',
+    t[5]||'', Number(t[6])||0, Number(t[7])||1,
+    Number(t[8])||'', '', '', t[11]||'', t[12]||''
+  ]);
+
+  // Sheet 2: Monthly summary
+  const monthly = {};
+  trades.forEach(t => {
+    const parts = parseDateParts(t[0]);
+    if (!parts) return;
+    const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const month = monthNames[parseInt(parts.m,10)-1] + ' ' + parts.y;
+    if (!monthly[month]) monthly[month] = { trades: 0, pnl: 0, wins: 0, capital: 0 };
+    monthly[month].trades++;
+    monthly[month].pnl += Number(t[6]) || 0;
+    if (Number(t[6]) > 0) monthly[month].wins++;
+    const cap = Number(t[4]) || 0;
+    if (cap > monthly[month].capital) monthly[month].capital = cap;
+  });
+  const monthHeaders = ['Month','Trades','P&L (₹)','Win %','ROI %'];
+  const monthRows = Object.entries(monthly).map(([m, r]) => {
+    const wr = ((r.wins / Math.max(1, r.trades)) * 100).toFixed(1);
+    const roi = r.capital > 0 ? ((r.pnl / r.capital) * 100).toFixed(2) : '';
+    return [m, r.trades, Math.round(r.pnl), parseFloat(wr), roi !== '' ? parseFloat(roi) : ''];
+  });
+
+  // Build workbook using SheetJS
+  const wb = XLSX.utils.book_new();
+
+  const ws1 = XLSX.utils.aoa_to_sheet([tradeHeaders, ...tradeRows]);
+  ws1['!cols'] = [10,8,6,8,10,10,10,6,10,0,0,20,8].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws1, 'Trades');
+
+  const ws2 = XLSX.utils.aoa_to_sheet([monthHeaders, ...monthRows]);
+  ws2['!cols'] = [12,8,12,8,8].map(w => ({ wch: w }));
+  XLSX.utils.book_append_sheet(wb, ws2, 'Monthly');
+
+  const version = activeVersion === 'All' ? 'All' : activeVersion;
+  const today = todayLocal();
+  XLSX.writeFile(wb, `StratLedger_${version}_${today}.xlsx`);
+}
+
 // ─── Init ───
 window.onload = () => {
-  // Fix: use local date (no UTC off-by-one)
   document.getElementById('date').value = todayLocal();
   document.getElementById('type').value = 'Live';
   document.getElementById('version').value = 'V7';
