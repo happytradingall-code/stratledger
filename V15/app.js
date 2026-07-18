@@ -502,3 +502,8 @@ window.onload = () => {
 
   ['user', 'direction', 'pnlv'].forEach(id => {
     document.getElementById(id).addEventListener('input', validateForm);
+  });
+
+  validateForm();
+  loadData();
+};
