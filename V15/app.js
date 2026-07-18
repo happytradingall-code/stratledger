@@ -64,9 +64,11 @@ function fmtAbs(n) {
 function buildVersionFilter() {
   const versions = [...new Set(allTrades.map(t => (t[3] || '').trim()).filter(Boolean))].sort();
   const bar = document.getElementById('versionFilterBar');
-  let html = `<button class="ver-btn ${activeVersion === 'All' ? 'active' : ''}" onclick="setVersion('All')">All</button>`;
+  const btnStyle = `flex-shrink:0;padding:8px 20px;border-radius:20px;border:2px solid #aaaaaa;background:#2a2a2a;color:#ffffff;font-size:13px;font-weight:600;cursor:pointer;font-family:monospace;`;
+  const activeBtnStyle = `flex-shrink:0;padding:8px 20px;border-radius:20px;border:2px solid #22d47a;background:#22d47a;color:#000000;font-size:13px;font-weight:600;cursor:pointer;font-family:monospace;`;
+  let html = `<button style="${activeVersion === 'All' ? activeBtnStyle : btnStyle}" onclick="setVersion('All')">All</button>`;
   versions.forEach(v => {
-    html += `<button class="ver-btn ${activeVersion === v ? 'active' : ''}" onclick="setVersion('${v}')">${v}</button>`;
+    html += `<button style="${activeVersion === v ? activeBtnStyle : btnStyle}" onclick="setVersion('${v}')">${v}</button>`;
   });
   bar.innerHTML = html;
 }
