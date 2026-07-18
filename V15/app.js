@@ -92,6 +92,11 @@ async function loadData() {
     const rows = await r.json();
     allTrades = rows.slice(1);
     trades = [...allTrades];
+    // DEBUG: remove after fixing
+    if (allTrades.length > 0) {
+      const sample = allTrades[0];
+      alert('Col3:' + sample[3] + ' | Col2:' + sample[2] + ' | Total:' + allTrades.length);
+    }
     buildVersionFilter();
     renderHome();
     renderLedger();
