@@ -29,6 +29,10 @@
   <!-- HOME PAGE -->
   <div id="home" class="page active">
 
+    <div class="version-filter-wrap">
+      <div id="versionFilterBar" class="version-filter-bar"></div>
+    </div>
+
     <div class="kpi-strip">
       <div class="kpi-card kpi-green">
         <div class="kpi-label">Total P&L</div>
@@ -187,7 +191,10 @@
   <div id="statsPage" class="page">
 
     <div class="section-card">
-      <div class="section-title" style="margin-bottom:14px">Performance Overview</div>
+      <div class="section-header">
+        <span class="section-title">Performance Overview</span>
+        <button class="excel-btn" onclick="downloadExcel()">⬇ Excel</button>
+      </div>
       <div id="stats" class="stats-grid"></div>
     </div>
 
@@ -234,6 +241,7 @@
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>
