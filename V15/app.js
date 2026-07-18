@@ -64,13 +64,16 @@ function fmtAbs(n) {
 function buildVersionFilter() {
   const versions = [...new Set(allTrades.map(t => (t[3] || '').trim()).filter(Boolean))].sort();
   const bar = document.getElementById('versionFilterBar');
-  const btnStyle = `flex-shrink:0;padding:8px 20px;border-radius:20px;border:2px solid #aaaaaa;background:#2a2a2a;color:#ffffff;font-size:13px;font-weight:600;cursor:pointer;font-family:monospace;`;
-  const activeBtnStyle = `flex-shrink:0;padding:8px 20px;border-radius:20px;border:2px solid #22d47a;background:#22d47a;color:#000000;font-size:13px;font-weight:600;cursor:pointer;font-family:monospace;`;
-  let html = `<button style="${activeVersion === 'All' ? activeBtnStyle : btnStyle}" onclick="setVersion('All')">All</button>`;
+  const base = 'flex-shrink:0;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:monospace;letter-spacing:0.5px;border:2px solid #555;background:#222;color:#fff;';
+  const active = 'flex-shrink:0;padding:8px 20px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;font-family:monospace;letter-spacing:0.5px;border:2px solid #22d47a;background:#22d47a;color:#000;';
+  let html = `<button data-v="All" style="${activeVersion==='All'?active:base}">All</button>`;
   versions.forEach(v => {
-    html += `<button style="${activeVersion === v ? activeBtnStyle : btnStyle}" onclick="setVersion('${v}')">${v}</button>`;
+    html += `<button data-v="${v}" style="${activeVersion===v?active:base}">${v}</button>`;
   });
   bar.innerHTML = html;
+  bar.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => setVersion(btn.getAttribute('data-v')));
+  });
 }
 
 function setVersion(v) {
