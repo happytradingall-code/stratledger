@@ -187,10 +187,7 @@
   <div id="statsPage" class="page">
 
     <div class="section-card">
-      <div class="section-header">
-        <span class="section-title">Performance Overview</span>
-        <button class="excel-btn" onclick="downloadExcel()">⬇ Excel</button>
-      </div>
+      <div class="section-title" style="margin-bottom:14px">Performance Overview</div>
       <div id="stats" class="stats-grid"></div>
     </div>
 
@@ -235,9 +232,66 @@
   </div>
 </nav>
 
+<!-- EDIT MODAL -->
+<div id="editModal" class="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Edit Trade</span>
+      <button class="modal-close" onclick="document.getElementById('editModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Date</label>
+      <input type="date" id="editDate" class="field-input">
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">User</label>
+        <select id="editUser" class="field-input">
+          <option>Nav</option><option>Visnu</option><option>VJ</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Type</label>
+        <select id="editType" class="field-input">
+          <option>Live</option><option>Paper</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Direction</label>
+        <select id="editDirection" class="field-input">
+          <option>Long</option><option>Short</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">P&L (₹)</label>
+        <input id="editPnl" class="field-input">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label class="field-label">Lots</label>
+        <input id="editLots" class="field-input">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Version</label>
+        <input id="editVersion" class="field-input">
+      </div>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Remarks</label>
+      <textarea id="editRemarks" class="field-input"></textarea>
+    </div>
+    <input type="hidden" id="editTradeId">
+    <div class="modal-actions">
+      <button class="btn-danger" onclick="deleteTradeConfirm()">Delete</button>
+      <button class="btn-primary" onclick="updateTrade()">Update</button>
+    </div>
+  </div>
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>
