@@ -481,3 +481,45 @@ button:active { transform: scale(0.98); }
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0.6);
 }
+
+/* ─── Logo Image ─── */
+.logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-right: 2px;
+}
+
+/* ─── Edit Ledger Button ─── */
+.edit-ledger-btn {
+  display: inline-block;
+  padding: 10px 24px;
+  border-radius: 10px;
+  border: 1.5px solid #63b3ed;
+  color: #63b3ed;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.18s;
+  letter-spacing: 0.3px;
+}
+.edit-ledger-btn:hover {
+  background: #63b3ed;
+  color: #000;
+}
+
+/* ─── App Footer ─── */
+.app-footer {
+  text-align: center;
+  padding: 18px 16px 90px;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+.app-footer strong {
+  color: #22d47a;
+  font-weight: 700;
+}
