@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>StratLedger V14</title>
+  <title>Nav's StratLedger</title>
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
@@ -12,7 +14,7 @@
 
 <div class="topbar">
   <div class="topbar-left">
-    <div class="logo-mark">SL</div>
+    <img src="logo.png" class="logo-img" alt="StratLedger Logo">
     <div class="logo-text">
       <span class="logo-name">StratLedger</span>
       <span class="logo-version">V14</span>
@@ -187,12 +189,17 @@
   <div id="statsPage" class="page">
 
     <div class="section-card">
-      <div class="section-header">   <span class="section-title">Performance Overview</span>   <button onclick="downloadExcel()" style="padding:6px 14px;border-radius:8px;border:1.5px solid #22d47a;background:transparent;color:#22d47a;font-size:12px;font-weight:600;cursor:pointer;">⬇ Excel</button> </div>
+      <div class="section-header">
+        <span class="section-title">Performance Overview</span>
+        <button onclick="downloadExcel()" style="padding:6px 14px;border-radius:8px;border:1.5px solid #22d47a;background:transparent;color:#22d47a;font-size:12px;font-weight:600;cursor:pointer;">⬇ Excel</button>
+      </div>
       <div id="stats" class="stats-grid"></div>
     </div>
 
     <div class="section-card">
-      <div class="section-title" style="margin-bottom:14px">Monthly Breakdown</div>
+      <div class="section-header">
+        <span class="section-title">Monthly Breakdown</span>
+      </div>
       <div id="monthlyTable"></div>
     </div>
 
@@ -204,8 +211,12 @@
     </div>
 
     <div class="section-card">
-      <div class="section-title" style="margin-bottom:14px">Trade Distribution</div>
+      <div class="section-title" style="margin-bottom:14px">Exit Distribution</div>
       <canvas id="distChart" height="160"></canvas>
+    </div>
+
+    <div class="section-card" style="text-align:center;">
+      <a href="https://docs.google.com/spreadsheets" target="_blank" class="edit-ledger-btn">✏️ Edit Ledger (Google Sheet)</a>
     </div>
 
   </div>
@@ -232,67 +243,13 @@
   </div>
 </nav>
 
-<!-- EDIT MODAL -->
-<div id="editModal" class="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-box">
-    <div class="modal-header">
-      <span class="modal-title">Edit Trade</span>
-      <button class="modal-close" onclick="document.getElementById('editModal').classList.remove('open')">✕</button>
-    </div>
-    <div class="field-group">
-      <label class="field-label">Date</label>
-      <input type="date" id="editDate" class="field-input">
-    </div>
-    <div class="field-row">
-      <div class="field-group">
-        <label class="field-label">User</label>
-        <select id="editUser" class="field-input">
-          <option>Nav</option><option>Visnu</option><option>VJ</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <label class="field-label">Type</label>
-        <select id="editType" class="field-input">
-          <option>Live</option><option>Paper</option>
-        </select>
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field-group">
-        <label class="field-label">Direction</label>
-        <select id="editDirection" class="field-input">
-          <option>Long</option><option>Short</option>
-        </select>
-      </div>
-      <div class="field-group">
-        <label class="field-label">P&L (₹)</label>
-        <input id="editPnl" class="field-input">
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field-group">
-        <label class="field-label">Lots</label>
-        <input id="editLots" class="field-input">
-      </div>
-      <div class="field-group">
-        <label class="field-label">Version</label>
-        <input id="editVersion" class="field-input">
-      </div>
-    </div>
-    <div class="field-group">
-      <label class="field-label">Remarks</label>
-      <textarea id="editRemarks" class="field-input"></textarea>
-    </div>
-    <input type="hidden" id="editTradeId">
-    <div class="modal-actions">
-      <button class="btn-danger" onclick="deleteTradeConfirm()">Delete</button>
-      <button class="btn-primary" onclick="updateTrade()">Update</button>
-    </div>
-  </div>
-</div>
+<!-- FOOTER -->
+<footer class="app-footer">
+  Developed by <strong>Naveen</strong> &nbsp;·&nbsp; Nav's StratLedger © 2026
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
 <script src="config.js"></script>
 <script src="app.js"></script>
 </body>
