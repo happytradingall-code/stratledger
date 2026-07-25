@@ -189,9 +189,6 @@ function renderLedger(filtered) {
           ${t[12] ? `<span class="lc-tag" style="font-size:10px">#${t[12]}</span>` : ''}
         </div>
         ${t[11] ? `<div class="lc-remarks">${t[11]}</div>` : ''}
-        <div class="lc-footer">
-          <button class="lc-edit-btn" onclick="openEdit('${t[12]}')">✏ Edit</button>
-        </div>
       </div>
     `;
   });
@@ -455,69 +452,6 @@ async function saveTrade() {
   }
 }
 
-// ─── Edit / Delete ───
-function openEdit(tradeId) {
-  const t = trades.find(x => x[12] == tradeId);
-  if (!t) return;
-
-  document.getElementById('editDate').value = String(t[0] || '').substring(0, 10); // keep YYYY-MM-DD for date input
-  document.getElementById('editUser').value = t[1] || '';
-  document.getElementById('editType').value = t[2] || 'Live';
-  document.getElementById('editDirection').value = t[5] || '';
-  document.getElementById('editPnl').value = t[6] || '';
-  document.getElementById('editLots').value = t[7] || '1';
-  document.getElementById('editVersion').value = t[3] || '';
-  document.getElementById('editRemarks').value = t[11] || '';
-  document.getElementById('editTradeId').value = tradeId;
-
-  document.getElementById('editModal').classList.add('open');
-}
-
-function closeModal(e) {
-  if (e.target.id === 'editModal') {
-    document.getElementById('editModal').classList.remove('open');
-  }
-}
-
-async function updateTrade() {
-  const tradeId = document.getElementById('editTradeId').value;
-  const payload = {
-    action: 'update',
-    tradeId,
-    date: document.getElementById('editDate').value,
-    user: document.getElementById('editUser').value,
-    type: document.getElementById('editType').value,
-    direction: document.getElementById('editDirection').value,
-    pnl: document.getElementById('editPnl').value,
-    lots: document.getElementById('editLots').value,
-    version: document.getElementById('editVersion').value,
-    remarks: document.getElementById('editRemarks').value,
-  };
-
-  try {
-    await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-    document.getElementById('editModal').classList.remove('open');
-    await loadData();
-  } catch(e) {
-    alert('Update failed. Please try again.');
-  }
-}
-
-async function deleteTradeConfirm() {
-  const tradeId = document.getElementById('editTradeId').value;
-  if (!confirm('Delete trade #' + tradeId + '? This cannot be undone.')) return;
-
-  const payload = { action: 'delete', tradeId };
-  try {
-    await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
-    document.getElementById('editModal').classList.remove('open');
-    await loadData();
-  } catch(e) {
-    alert('Delete failed. Please try again.');
-  }
-}
-
-// ─── Init ───
 // ─── Download Excel ───
 function downloadExcel() {
   if (!trades.length) return;
