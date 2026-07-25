@@ -11,11 +11,18 @@ function todayLocal() {
   return `${y}-${m}-${day}`;
 }
 
-// ─── Fix: display date without any timezone conversion ───
-// Google Sheets can return "2026-06-12", "2026-06-12T00:00:00.000Z", or "06/12/2026"
-// We ONLY read the digit characters — never pass through new Date()
+// ─── Fix: display date in IST — add 1 day for ISO timestamps from Google Sheets ───
 function fixDate(raw) {
   const s = String(raw || '').trim();
+  if (s.includes('T')) {
+    const d = new Date(s);
+    if (!isNaN(d)) {
+      const ist = new Date(d.getTime() + 5.5 * 60 * 60 * 1000);
+      return String(ist.getUTCDate()).padStart(2,'0') + '/' +
+             String(ist.getUTCMonth()+1).padStart(2,'0') + '/' +
+             ist.getUTCFullYear();
+    }
+  }
   const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return iso[3] + '/' + iso[2] + '/' + iso[1];
   const us = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
@@ -25,6 +32,13 @@ function fixDate(raw) {
 
 function parseDateParts(raw) {
   const s = String(raw || '').trim();
+  if (s.includes('T')) {
+    const d = new Date(s);
+    if (!isNaN(d)) {
+      const ist = new Date(d.getTime() + 5.5 * 60 * 60 * 1000);
+      return { y: String(ist.getUTCFullYear()), m: String(ist.getUTCMonth()+1).padStart(2,'0'), d: String(ist.getUTCDate()).padStart(2,'0') };
+    }
+  }
   const iso = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return { y: iso[1], m: iso[2], d: iso[3] };
   const us = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
@@ -42,7 +56,7 @@ function showPage(id, navId) {
 // ─── Format helpers ───
 function fmt(n) {
   const v = Number(n);
-  return (v >= 0 ? '+' : '') + '₹' + Math.abs(v).toLocaleString('en-IN');
+  return (v >= 0 ? '+' : '-') + '₹' + Math.abs(v).toLocaleString('en-IN');
 }
 
 function fmtAbs(n) {
@@ -55,6 +69,11 @@ async function loadData() {
     const r = await fetch(API_URL);
     const rows = await r.json();
     trades = rows.slice(1);
+    // Set version field to latest trade's version
+    if (trades.length) {
+      const latestVersion = (trades[trades.length - 1][3] || '').trim();
+      if (latestVersion) document.getElementById('version').value = latestVersion;
+    }
     renderHome();
     renderLedger();
     renderStats();
@@ -295,17 +314,41 @@ function renderDistChart() {
   const canvas = document.getElementById('distChart');
   if (!canvas) return;
   if (window.distChartObj) window.distChartObj.destroy();
-  const wins = trades.filter(t => Number(t[6]) > 0).length;
-  const losses = trades.filter(t => Number(t[6]) < 0).length;
-  const breakeven = trades.filter(t => Number(t[6]) === 0).length;
+
+  const categories = { 'Target': 0, 'SL': 0, 'Chan': 0, 'Time': 0, 'No Prog': 0, 'Other': 0 };
+  trades.forEach(t => {
+    const r = (t[11] || '').toLowerCase();
+    if (r.includes('target'))         categories['Target']++;
+    else if (r.includes('sl') || r.includes('stop'))  categories['SL']++;
+    else if (r.includes('chan'))       categories['Chan']++;
+    else if (r.includes('time'))       categories['Time']++;
+    else if (r.includes('no prog') || r.includes('noprog') || r.includes('no progress')) categories['No Prog']++;
+    else                               categories['Other']++;
+  });
+
+  const labels = Object.keys(categories).filter(k => categories[k] > 0);
+  const data   = labels.map(k => categories[k]);
+  const colors = {
+    'Target':  'rgba(34,212,122,0.75)',
+    'SL':      'rgba(240,82,82,0.75)',
+    'Chan':    'rgba(99,179,237,0.75)',
+    'Time':    'rgba(246,173,85,0.75)',
+    'No Prog': 'rgba(159,122,234,0.75)',
+    'Other':   'rgba(122,128,153,0.5)',
+  };
+  const borders = {
+    'Target': '#22d47a', 'SL': '#f05252', 'Chan': '#63b3ed',
+    'Time': '#f6ad55', 'No Prog': '#9f7aea', 'Other': '#7a8099',
+  };
+
   window.distChartObj = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels: ['Wins', 'Losses', 'Breakeven'],
+      labels,
       datasets: [{
-        data: [wins, losses, breakeven],
-        backgroundColor: ['rgba(34,212,122,0.7)', 'rgba(240,82,82,0.7)', 'rgba(122,128,153,0.4)'],
-        borderColor: ['#22d47a', '#f05252', '#7a8099'],
+        data,
+        backgroundColor: labels.map(l => colors[l]),
+        borderColor: labels.map(l => borders[l]),
         borderWidth: 1,
       }]
     },
